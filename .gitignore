@@ -1,3 +1,4 @@
 secrets.py
-__pycharm__
+*__pycharm__
 .idea
+venv
