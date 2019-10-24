@@ -4,21 +4,16 @@ from . import serializers
 from rest_framework import generics, status
 from rest_framework.response import Response
 
-class PBIListView(generics.ListAPIView):
-    queryset = PBI.objects.all()
-    serializer_class = serializers.PBISerializer
-
-class PBICreateView(generics.CreateAPIView):
-    queryset = PBI.objects.all()
+class PBIListAndCreateView(generics.ListAPIView,generics.CreateAPIView):
+    queryset = PBI.objects.all().order_by('priority')
     serializer_class = serializers.PBISerializer
 
     def create(self, request, *args, **kwargs):
-        super(PBICreateView, self).create(request, args, kwargs)
+        super(PBIListAndCreateView, self).create(request, args, kwargs)
         response = {"status_code": status.HTTP_200_OK,
                     "message": "Successfully created",
                     "result": request.data}
         return Response(response)
-
 
 class PBIDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = PBI.objects.all()
