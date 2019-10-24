@@ -3,7 +3,7 @@ from . import views
 from .api import views
 
 urlpatterns = [
-    path('', views.PBIListView.as_view(), name=None),
-    path('create/', views.PBICreateView.as_view(), name=None),
-    path('<int:pk>/', views.PBIDetailView.as_view(), name=None)
+    path('pbi/', views.PBIListView.as_view(), name=None),
+    path('pbi/create/', views.PBICreateView.as_view(), name=None),
+    path('pbi/<int:pk>/', views.PBIDetailView.as_view(), name=None)
 ]
