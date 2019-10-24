@@ -49,3 +49,5 @@ class PBIDetailView(generics.RetrieveUpdateDestroyAPIView):
         response = {"status_code": status.HTTP_200_OK,
                     "message": "Successfully deleted"}
         return Response(response)
+
+
