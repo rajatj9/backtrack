@@ -8,7 +8,17 @@ class PBIListAndCreateView(generics.ListAPIView,generics.CreateAPIView):
     queryset = PBI.objects.all().order_by('priority')
     serializer_class = serializers.PBISerializer
 
+
+    def update_priorities(self, inserting_priority):
+        lower_priorities = PBI.objects.filter(priority__gte=inserting_priority)
+        for item in lower_priorities:
+            item.priority += 1
+        lower_priorities.update()
+
+
     def create(self, request, *args, **kwargs):
+        inserting_priority = request.data['priority']
+        self.update_priorities(inserting_priority)
         super(PBIListAndCreateView, self).create(request, args, kwargs)
         response = {"status_code": status.HTTP_201_CREATED,
                     "message": "Successfully created",
