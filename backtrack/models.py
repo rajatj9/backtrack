@@ -12,6 +12,7 @@ class Sprint(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     capacity = models.IntegerField()
+    project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
 
 # Create your models here.
 class PBI(models.Model):
@@ -24,7 +25,7 @@ class PBI(models.Model):
     sprint_id = models.ForeignKey(Sprint, on_delete=models.CASCADE, default="NULL")
 
 class Tasks(models.Model):
-    sprint_id = models.ForeignKey(Sprint, on_delete=models.CASCADE)
+    developer = models.ForeignKey(Person, on_delete=models.CASCADE)
     pbi_id = models.ForeignKey(PBI, on_delete=models.CASCADE)
     description = models.CharField(max_length=500)
     effort_hours = models.IntegerField()
