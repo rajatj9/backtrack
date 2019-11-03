@@ -57,6 +57,29 @@ class SprintCreateAndListView(generics.ListCreateAPIView):
     queryset = Sprint.objects.all()
     serializer_class = SprintSerializer
 
+    def create(self, request, *args, **kwargs):
+        print(request.data)
+        pbis = request.data.pop('pbis')
+        project_id = request.data.pop('project')
+        project = Project.objects.get(pk=project_id)
+        sprint = Sprint.objects.create(**request.data, project=project)
+        for pbi in pbis:
+            pbi_id = pbi["pbi_id"]
+            pbi_obj = PBI.objects.get(pk=pbi_id)
+            PBI.objects.filter(pk=pbi_id).update(sprint_id=sprint)
+            for task in pbi["tasks"]:
+                if 'developer' in task:
+                    developer_id = task.pop('developer')
+                    developer = Person.objects.get(pk=developer_id)
+                    print(developer)
+                    Tasks.objects.create(pbi=pbi_obj, developer=developer, **task)
+                else:
+                    Tasks.objects.create(pbi=pbi_obj, **task)
+        response = {"status_code": status.HTTP_201_CREATED,
+                    "message": "Successfully created",
+                    "result": request.data}
+        return Response(response)
+
 class SprintListView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SprintSerializer
     queryset = Sprint.objects.all()
