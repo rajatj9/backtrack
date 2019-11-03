@@ -1,13 +1,12 @@
 
-from ..models import PBI
-from . import serializers
+from ..models import PBI, Sprint, Project, Person, Tasks
+from .serializers import *
 from rest_framework import generics, status
 from rest_framework.response import Response
 
-class PBIListAndCreateView(generics.ListAPIView,generics.CreateAPIView):
+class PBICreateAndListView(generics.ListCreateAPIView):
     queryset = PBI.objects.all().order_by('priority')
-    serializer_class = serializers.PBISerializer
-
+    serializer_class = PBISerializer
 
     def update_priorities(self, inserting_priority):
         lower_priorities = PBI.objects.filter(priority__gte=inserting_priority)
@@ -15,11 +14,10 @@ class PBIListAndCreateView(generics.ListAPIView,generics.CreateAPIView):
             item.priority += 1
         lower_priorities.update()
 
-
     def create(self, request, *args, **kwargs):
         inserting_priority = request.data['priority']
         self.update_priorities(inserting_priority)
-        super(PBIListAndCreateView, self).create(request, args, kwargs)
+        super(PBICreateAndListView, self).create(request, args, kwargs)
         response = {"status_code": status.HTTP_201_CREATED,
                     "message": "Successfully created",
                     "result": request.data}
@@ -27,7 +25,7 @@ class PBIListAndCreateView(generics.ListAPIView,generics.CreateAPIView):
 
 class PBIDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = PBI.objects.all()
-    serializer_class = serializers.PBISerializer
+    serializer_class = PBISerializer
 
     def retrieve(self, request, *args, **kwargs):
         super(PBIDetailView, self).retrieve(request, args, kwargs)
@@ -55,4 +53,34 @@ class PBIDetailView(generics.RetrieveUpdateDestroyAPIView):
                     "message": "Successfully deleted"}
         return Response(response)
 
+class SprintCreateAndListView(generics.ListCreateAPIView):
+    queryset = Sprint.objects.all()
+    serializer_class = SprintSerializer
 
+class SprintListView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = SprintSerializer
+    queryset = Sprint.objects.all()
+
+class PersonCreateAndListView(generics.ListCreateAPIView):
+    queryset = Person.objects.all()
+    serializer_class = PersonSerializer
+
+class PersonListView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Person.objects.all()
+    serializer_class = PersonSerializer
+
+class ProjectCreateAndListView(generics.ListCreateAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+
+class ProjectListView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+
+class TasksCreateAndListView(generics.ListCreateAPIView):
+    queryset = Tasks.objects.all()
+    serializer_class = TasksSerializer
+
+class TasksListView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Tasks.objects.all()
+    serializer_class = TasksSerializer
