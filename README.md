@@ -1,9 +1,9 @@
 # Backtrack
-### Starting the server: ###
+Starting the server:
 
 `python manage.py runserver`
 
-### Database updates: ###
+Database updates:
 
 `python manage.py makemigrations`
 
@@ -38,3 +38,4 @@
 * /Sprint
 * /pbi
 * /tasks
+
