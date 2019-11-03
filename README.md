@@ -1,15 +1,15 @@
 # Backtrack
-Starting the server:
+### Starting the server: ###
 
 `python manage.py runserver`
 
-Database updates:
+### Database updates: ###
 
 `python manage.py makemigrations`
 
 `python manage.py migrate`
 
-Schema for Sprint creation:
+### Schema for Sprint creation: ###
 
 ```
 {
@@ -31,3 +31,11 @@ Schema for Sprint creation:
   ]
 }
 ```
+
+### Available Endpoints for CRUD: ###
+* /person
+* /project
+* /Sprint
+* /pbi
+* /tasks
+
