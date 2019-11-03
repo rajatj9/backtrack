@@ -12,6 +12,7 @@ class Sprint(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     capacity = models.IntegerField()
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
 # Create your models here.
 class PBI(models.Model):
@@ -20,12 +21,12 @@ class PBI(models.Model):
     priority = models.IntegerField()
     status = models.CharField(max_length=50, default="Not Yet Started")
     story_points = models.IntegerField(default=0)
-    project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
-    sprint_id = models.ForeignKey(Sprint, on_delete=models.CASCADE, default="NULL")
+    project_id = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    sprint_id = models.ForeignKey(Sprint, on_delete=models.CASCADE, null=True)
 
 class Tasks(models.Model):
-    sprint_id = models.ForeignKey(Sprint, on_delete=models.CASCADE)
-    pbi_id = models.ForeignKey(PBI, on_delete=models.CASCADE)
+    developer = models.ForeignKey(Person, on_delete=models.CASCADE, null=True)
+    pbi = models.ForeignKey(PBI, on_delete=models.CASCADE)
     description = models.CharField(max_length=500)
     effort_hours = models.IntegerField()
 
