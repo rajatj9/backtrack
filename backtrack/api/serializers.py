@@ -10,7 +10,7 @@ class PBISerializer(serializers.ModelSerializer):
 class SprintSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sprint
-        fields = '__all__'
+        fields = ('id','start_date','end_date','capacity','project')
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
