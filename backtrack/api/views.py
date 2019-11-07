@@ -12,7 +12,9 @@ class PBICreateAndListView(generics.ListCreateAPIView):
         lower_priorities = PBI.objects.filter(priority__gte=inserting_priority)
         for item in lower_priorities:
             item.priority += 1
-        lower_priorities.update()
+            item.save()
+
+
 
     def create(self, request, *args, **kwargs):
         inserting_priority = request.data['priority']
