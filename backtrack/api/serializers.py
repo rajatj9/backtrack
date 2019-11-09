@@ -25,6 +25,6 @@ class ProjectSerializer(serializers.ModelSerializer):
 class TasksSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tasks
-        fields = ('developer', 'pbi', 'description', 'effort_hours','id')
+        fields = ('id', 'pbi', 'description', 'developer', 'effort_hours','completed')
 
 
