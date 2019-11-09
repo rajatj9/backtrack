@@ -85,6 +85,61 @@ class SprintCreateAndListView(generics.ListCreateAPIView):
 class SprintListView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SprintSerializer
     queryset = Sprint.objects.all()
+    def retrieve(self, request, *args, **kwargs):
+        super().retrieve(request, args, kwargs)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+        pbis = PBI.objects.filter(sprint_id=instance.id)
+        data["pbis"] = []
+        for pbi in pbis:
+            pbi_serialized = PBISerializer(pbi)
+            task_for_pbi = Tasks.objects.filter(pbi=pbi.id)
+            task_serialized = TasksSerializer(task_for_pbi,many=True)
+            temp = {}
+            temp["pbi_id"] = pbi.id
+            temp["tasks"] = task_serialized.data
+            data["pbis"].append(temp)
+        print(data)
+        response = {"status_code": status.HTTP_200_OK,
+                    "message": "Successfully retrieved",
+                    "result": data}
+        return Response(response)
+
+class CurrentSprintView(generics.RetrieveUpdateDestroyAPIView):
+    #we first get the project object first from the project ID
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    def retrieve(self,request,*args,**kwargs):
+        super().retrieve(request, args, kwargs)
+        project_instance = self.get_object()
+        # get this sprint objects belonging to this project
+        sprints = Sprint.objects.filter(project=project_instance)
+
+        #get the most recent sprint (by start_date)
+        current_sprint = sprints.latest()
+        serializer = SprintSerializer(current_sprint)
+        data = serializer.data
+
+        #get PBI objects for this sprint from its sprint id
+        pbis = PBI.objects.filter(sprint_id=current_sprint.id)
+        data["pbis"] = []
+        for pbi in pbis:
+            pbi_serialized = PBISerializer(pbi)
+            #get the tasks for this PBI
+            task_for_pbi = Tasks.objects.filter(pbi=pbi.id)
+            task_serialized = TasksSerializer(task_for_pbi, many=True)
+            temp = {}
+            temp["pbi_id"] = pbi.id
+            temp["tasks"] = task_serialized.data
+            data["pbis"].append(temp)
+
+        response = {"status_code": status.HTTP_200_OK,
+                    "message": "Successfully retrieved",
+                    "result": data}
+        return Response(response)
+
+
 
 class PersonCreateAndListView(generics.ListCreateAPIView):
     queryset = Person.objects.all()

@@ -12,6 +12,6 @@ urlpatterns = [
     path('project/', views.ProjectCreateAndListView.as_view(), name=None),
     path('project/<int:pk>/', views.ProjectListView.as_view(), name=None),
     path('sprint/', views.SprintCreateAndListView.as_view(), name=None),
-    path('sprint/<int:pk>/', views.SprintListView.as_view(), name=None),
-
+    path('sprint/<int:pk>/', views.SprintListView.as_view(), name=None), #pk is sprint_id
+    path('currentsprint/<int:pk>/',views.CurrentSprintView.as_view(),name=None), #pk is project_id
 ]

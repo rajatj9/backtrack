@@ -14,6 +14,10 @@ class Sprint(models.Model):
     capacity = models.IntegerField()
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
+    #this is for getting the most recent sprint by start date
+    class Meta:
+        get_latest_by = 'start_date'
+
 # Create your models here.
 class PBI(models.Model):
     name = models.CharField(max_length=250)
