@@ -14,8 +14,6 @@ class PBICreateAndListView(generics.ListCreateAPIView):
             item.priority += 1
             item.save()
 
-
-
     def create(self, request, *args, **kwargs):
         inserting_priority = request.data['priority']
         self.update_priorities(inserting_priority)
@@ -28,6 +26,12 @@ class PBICreateAndListView(generics.ListCreateAPIView):
 class PBIDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = PBI.objects.all()
     serializer_class = PBISerializer
+
+    def update_priorities(self, inserting_priority):
+        lower_priorities = PBI.objects.filter(priority__gt=inserting_priority)
+        for item in lower_priorities:
+            item.priority -= 1
+            item.save()
 
     def retrieve(self, request, *args, **kwargs):
         super(PBIDetailView, self).retrieve(request, args, kwargs)
@@ -50,7 +54,12 @@ class PBIDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Response(response)
 
     def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+        priority = data['priority']
         super(PBIDetailView, self).delete(request, args, kwargs)
+        self.update_priorities(priority)
         response = {"status_code": status.HTTP_200_OK,
                     "message": "Successfully deleted"}
         return Response(response)
@@ -84,7 +93,6 @@ class SprintCreateAndListView(generics.ListCreateAPIView):
 
 class SprintListView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SprintSerializer
-    queryset = Sprint.objects.all()
     def retrieve(self, request, *args, **kwargs):
         super().retrieve(request, args, kwargs)
         instance = self.get_object()
