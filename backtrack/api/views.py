@@ -95,6 +95,7 @@ class SprintCreateAndListView(generics.ListCreateAPIView):
     #     return Response(response)
 
 class SprintListView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Sprint.objects.all()
     serializer_class = SprintSerializer
     def retrieve(self, request, *args, **kwargs):
         super().retrieve(request, args, kwargs)
