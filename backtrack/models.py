@@ -32,8 +32,9 @@ class Tasks(models.Model):
     developer = models.ForeignKey(Person, on_delete=models.CASCADE, null=True)
     pbi = models.ForeignKey(PBI, on_delete=models.CASCADE)
     description = models.CharField(max_length=500)
+    name = models.CharField(max_length=500)
     effort_hours = models.IntegerField()
-    completed = models.BooleanField(default=False)
+    status = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name

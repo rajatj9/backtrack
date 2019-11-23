@@ -58,29 +58,29 @@ class PBIDetailView(generics.RetrieveUpdateDestroyAPIView):
 class SprintCreateAndListView(generics.ListCreateAPIView):
     queryset = Sprint.objects.all()
     serializer_class = SprintSerializer
-
-    def create(self, request, *args, **kwargs):
-        print(request.data)
-        pbis = request.data.pop('pbis')
-        project_id = request.data.pop('project')
-        project = Project.objects.get(pk=project_id)
-        sprint = Sprint.objects.create(**request.data, project=project)
-        for pbi in pbis:
-            pbi_id = pbi["pbi_id"]
-            pbi_obj = PBI.objects.get(pk=pbi_id)
-            PBI.objects.filter(pk=pbi_id).update(sprint_id=sprint)
-            for task in pbi["tasks"]:
-                if 'developer' in task:
-                    developer_id = task.pop('developer')
-                    developer = Person.objects.get(pk=developer_id)
-                    print(developer)
-                    Tasks.objects.create(pbi=pbi_obj, developer=developer, **task)
-                else:
-                    Tasks.objects.create(pbi=pbi_obj, **task)
-        response = {"status_code": status.HTTP_201_CREATED,
-                    "message": "Successfully created",
-                    "result": request.data}
-        return Response(response)
+    #
+    # def create(self, request, *args, **kwargs):
+    #     print(request.data)
+    #     project_id = request.data['project']
+    #     project = Project.objects.get(pk=project_id)
+    #     Sprint.objects.create(**request.data, project=project)
+    #     # for pbi in pbis:
+    #     #     pbi_id = pbi["pbi_id"]
+    #     #     pbi_obj = PBI.objects.get(pk=pbi_id)
+    #     #     PBI.objects.filter(pk=pbi_id).update(sprint_id=sprint)
+    #     #     PBI.objects.filter(pk=pbi_id).update(state="ONGOING")
+    #     #     for task in pbi["tasks"]:
+    #     #         if 'developer' in task:
+    #     #             developer_id = task.pop('developer')
+    #     #             developer = Person.objects.get(pk=developer_id)
+    #     #             print(developer)
+    #     #             Tasks.objects.create(pbi=pbi_obj, developer=developer, **task)
+    #     #         else:
+    #     #             Tasks.objects.create(pbi=pbi_obj, **task)
+    #     response = {"status_code": status.HTTP_201_CREATED,
+    #                 "message": "Successfully created",
+    #                 "result": request.data}
+    #     return Response(response)
 
 class SprintListView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SprintSerializer
@@ -110,6 +110,7 @@ class CurrentSprintView(generics.RetrieveUpdateDestroyAPIView):
     #we first get the project object first from the project ID
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+
     def retrieve(self,request,*args,**kwargs):
         super().retrieve(request, args, kwargs)
         project_instance = self.get_object()
@@ -139,8 +140,6 @@ class CurrentSprintView(generics.RetrieveUpdateDestroyAPIView):
                     "result": data}
         return Response(response)
 
-
-
 class PersonCreateAndListView(generics.ListCreateAPIView):
     queryset = Person.objects.all()
     serializer_class = PersonSerializer
@@ -160,6 +159,19 @@ class ProjectListView(generics.RetrieveUpdateDestroyAPIView):
 class TasksCreateAndListView(generics.ListCreateAPIView):
     queryset = Tasks.objects.all()
     serializer_class = TasksSerializer
+
+    def create(self, request, *args, **kwargs):
+        request.GET._mutable = True
+        sprint_id = request.data.pop('sprint_id')
+        pbi_id = request.data['pbi_id']
+        pbi = PBI.objects.filter(pk=pbi_id)
+        pbi.update(sprint_id=sprint_id)
+        pbi.update(status="ONGOING")
+        Tasks.objects.create(**request.data)
+        response = {"status_code": status.HTTP_201_CREATED,
+                    "message": "Successfully created",
+                    "result": request.data}
+        return Response(response)
 
 class TasksListView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Tasks.objects.all()
