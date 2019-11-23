@@ -48,6 +48,9 @@ class PBIDetailView(generics.RetrieveUpdateDestroyAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         data = serializer.data
+        if 'sprint_id' in request.data and 'status' in request.data:
+            Tasks.objects.filter(pbi=data['id']).delete()
+            Tasks.objects.filter(pbi=data['id']).delete()
         response = {"status_code": status.HTTP_200_OK,
                     "message": "Successfully updated",
                     "result": data}
