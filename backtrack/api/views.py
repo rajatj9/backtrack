@@ -109,6 +109,7 @@ class SprintListView(generics.RetrieveUpdateDestroyAPIView):
             task_serialized = TasksSerializer(task_for_pbi,many=True)
             temp = {}
             temp["pbi_id"] = pbi.id
+            temp["name"] = pbi.name
             temp["tasks"] = task_serialized.data
             data["pbis"].append(temp)
         print(data)
