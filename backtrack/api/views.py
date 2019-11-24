@@ -190,3 +190,13 @@ class TasksCreateAndListView(generics.ListCreateAPIView):
 class TasksListView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Tasks.objects.all()
     serializer_class = TasksSerializer
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+        super(TasksListView, self).delete(request, args, kwargs)
+        response = {"status_code": status.HTTP_200_OK,
+                    "message": "Successfully deleted",
+                    "result": data}
+        return Response(response)
