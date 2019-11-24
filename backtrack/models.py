@@ -34,7 +34,7 @@ class Tasks(models.Model):
     description = models.CharField(max_length=500)
     name = models.CharField(max_length=500)
     effort_hours = models.IntegerField()
-    status = models.CharField(max_length=100)
+    status = models.CharField(max_length=100, default="Not Yet Started")
 
     def __str__(self):
         return self.name
