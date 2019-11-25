@@ -78,6 +78,9 @@ class PBIDetailView(generics.RetrieveUpdateDestroyAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         data = serializer.data
+        if 'sprint_id' in request.data and 'status' in request.data:
+            Tasks.objects.filter(pbi=data['id']).delete()
+            Tasks.objects.filter(pbi=data['id']).delete()
         response = {"status_code": status.HTTP_200_OK,
                     "message": "Successfully updated",
                     "result": data}
@@ -146,6 +149,7 @@ class SprintCreateAndListView(generics.ListCreateAPIView):
     #     return Response(response)
 
 class SprintListView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Sprint.objects.all()
     serializer_class = SprintSerializer
 
     def check_completion(self, sprint_id):
@@ -172,6 +176,7 @@ class SprintListView(generics.RetrieveUpdateDestroyAPIView):
             task_serialized = TasksSerializer(task_for_pbi,many=True)
             temp = {}
             temp["pbi_id"] = pbi.id
+            temp["name"] = pbi.name
             temp["tasks"] = task_serialized.data
             temp["status"] = pbi.status
             data["pbis"].append(temp)
@@ -206,6 +211,7 @@ class CurrentSprintView(generics.RetrieveUpdateDestroyAPIView):
             task_serialized = TasksSerializer(task_for_pbi, many=True)
             temp = {}
             temp["pbi_id"] = pbi.id
+            temp["name"] = pbi.name
             temp["tasks"] = task_serialized.data
             data["pbis"].append(temp)
 
@@ -250,3 +256,23 @@ class TasksCreateAndListView(generics.ListCreateAPIView):
 class TasksListView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Tasks.objects.all()
     serializer_class = TasksSerializer
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+        super(TasksListView, self).delete(request, args, kwargs)
+        response = {"status_code": status.HTTP_200_OK,
+                    "message": "Successfully deleted",
+                    "result": data}
+        return Response(response)
+
+    def patch(self, request, *args, **kwargs):
+        super(TasksListView, self).patch(request, args, kwargs)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+        response = {"status_code": status.HTTP_200_OK,
+                    "message": "Successfully updated",
+                    "result": data}
+        return Response(response)
