@@ -162,12 +162,22 @@ class SprintListView(generics.RetrieveUpdateDestroyAPIView):
         if(all_pbis_completed):
             Sprint.objects.filter(id=sprint_id).update(status="COMPLETED")
 
+    def check_date_pass(self, end_date):
+        if(datetime.today().date() > end_date):
+            return True
+        else:
+            return False
+
     def retrieve(self, request, *args, **kwargs):
         super().retrieve(request, args, kwargs)
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         data = serializer.data
         self.check_completion(data['id'])
+        for p in Sprint.objects.all():
+            if (self.check_date_pass(p.end_date)):  # check if the date for any sprint has passed
+                p.status = "COMPLETED"
+
         pbis = PBI.objects.filter(sprint_id=instance.id)
         data["pbis"] = []
         for pbi in pbis:
