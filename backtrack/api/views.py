@@ -1,4 +1,3 @@
-
 from ..models import PBI, Sprint, Project, Person, Tasks
 from .serializers import *
 from rest_framework import generics, status
@@ -9,8 +8,6 @@ class PBICreateAndListView(generics.ListCreateAPIView):
 
     queryset = PBI.objects.all().order_by('priority')
     serializer_class = PBISerializer
-
-
 
     def get(self, request, *args, **kwargs):
         for q in PBI.objects.all():

@@ -27,4 +27,3 @@ class TasksSerializer(serializers.ModelSerializer):
         model = Tasks
         fields = ('id', 'pbi', 'description', 'name', 'developer', 'effort_hours','status')
 
-
