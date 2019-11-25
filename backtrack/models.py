@@ -13,7 +13,7 @@ class Sprint(models.Model):
     end_date = models.DateField()
     capacity = models.IntegerField()
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-
+    status = models.CharField(max_length=50, default="Ongoing")
     #this is for getting the most recent sprint by start date
     class Meta:
         get_latest_by = 'start_date'
@@ -38,4 +38,3 @@ class Tasks(models.Model):
 
     def __str__(self):
         return self.name
-

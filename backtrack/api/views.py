@@ -1,12 +1,29 @@
-
 from ..models import PBI, Sprint, Project, Person, Tasks
 from .serializers import *
 from rest_framework import generics, status
 from rest_framework.response import Response
+from datetime import *
 
 class PBICreateAndListView(generics.ListCreateAPIView):
+
     queryset = PBI.objects.all().order_by('priority')
     serializer_class = PBISerializer
+
+    def get(self, request, *args, **kwargs):
+        for q in PBI.objects.all():
+            self.check_completion(q.id)
+        return self.list(request, *args, **kwargs)
+
+    def check_completion(self, pbi_id):
+        tasks = Tasks.objects.filter(pbi= pbi_id)
+        print("TASKS:", tasks)
+        all_tasks_completed = True
+        for task in tasks:
+            if(task.status!="COMPLETED"):
+                all_tasks_completed = False
+                break
+        if(all_tasks_completed):
+            PBI.objects.filter(id=pbi_id).update(status="COMPLETED")
 
     def update_priorities(self, inserting_priority):
         lower_priorities = PBI.objects.filter(priority__gte=inserting_priority)
@@ -27,6 +44,17 @@ class PBIDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = PBI.objects.all()
     serializer_class = PBISerializer
 
+    def check_completion(self, pbi_id):
+        tasks = Tasks.objects.filter(pbi= pbi_id)
+        print("TASKS:", tasks)
+        all_tasks_completed = True
+        for task in tasks:
+            if(task.status!="COMPLETED"):
+                all_tasks_completed = False
+                break
+        if(all_tasks_completed):
+            PBI.objects.filter(id=pbi_id).update(status="COMPLETED")
+
     def update_priorities(self, inserting_priority):
         lower_priorities = PBI.objects.filter(priority__gt=inserting_priority)
         for item in lower_priorities:
@@ -38,6 +66,8 @@ class PBIDetailView(generics.RetrieveUpdateDestroyAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         data = serializer.data
+        id_to_send = data['id']
+        self.check_completion(id_to_send)
         response = {"status_code": status.HTTP_200_OK,
                     "message": "Successfully retrieved",
                     "result": data}
@@ -70,6 +100,30 @@ class PBIDetailView(generics.RetrieveUpdateDestroyAPIView):
 class SprintCreateAndListView(generics.ListCreateAPIView):
     queryset = Sprint.objects.all()
     serializer_class = SprintSerializer
+
+    def check_pbi_completion(self, sprint_id):
+        pbis = PBI.objects.filter(sprint_id = sprint_id)
+        all_pbis_completed = True
+        for pbi in pbis:
+            if(pbi.status!="COMPLETED"):
+                all_pbis_completed = False
+                break
+        if(all_pbis_completed):
+            Sprint.objects.filter(id=sprint_id).update(status="COMPLETED")
+
+    def check_date_pass(self, end_date):
+        if(datetime.today().date() > end_date):
+            return True
+        else:
+            return False
+
+    def get(self, request, *args, **kwargs):
+        for p in Sprint.objects.all():
+            self.check_pbi_completion(p.id) #check if PBI is completed
+            if(self.check_date_pass(p.end_date)): #check if the date has passed
+                p.status = "COMPLETED"
+
+        return self.list(request, *args, **kwargs)
     #
     # def create(self, request, *args, **kwargs):
     #     print(request.data)
@@ -97,11 +151,23 @@ class SprintCreateAndListView(generics.ListCreateAPIView):
 class SprintListView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Sprint.objects.all()
     serializer_class = SprintSerializer
+
+    def check_completion(self, sprint_id):
+        pbis = PBI.objects.filter(sprint_id = sprint_id)
+        all_pbis_completed = True
+        for pbi in pbis:
+            if(pbi.status!="COMPLETED"):
+                all_pbis_completed = False
+                break
+        if(all_pbis_completed):
+            Sprint.objects.filter(id=sprint_id).update(status="COMPLETED")
+
     def retrieve(self, request, *args, **kwargs):
         super().retrieve(request, args, kwargs)
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         data = serializer.data
+        self.check_completion(data['id'])
         pbis = PBI.objects.filter(sprint_id=instance.id)
         data["pbis"] = []
         for pbi in pbis:
@@ -112,8 +178,8 @@ class SprintListView(generics.RetrieveUpdateDestroyAPIView):
             temp["pbi_id"] = pbi.id
             temp["name"] = pbi.name
             temp["tasks"] = task_serialized.data
+            temp["status"] = pbi.status
             data["pbis"].append(temp)
-        print(data)
         response = {"status_code": status.HTTP_200_OK,
                     "message": "Successfully retrieved",
                     "result": data}

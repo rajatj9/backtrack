@@ -10,7 +10,7 @@ class PBISerializer(serializers.ModelSerializer):
 class SprintSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sprint
-        fields = ('id','start_date','end_date','capacity','project')
+        fields = ('id','start_date','end_date','capacity','project', 'status')
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,5 +26,4 @@ class TasksSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tasks
         fields = ('id', 'pbi', 'description', 'name', 'developer', 'effort_hours','status')
-
 
