@@ -1,4 +1,4 @@
-from ..models import PBI, Sprint, Project, Person, Tasks
+from ..models import PBI, Sprint, Project, Developer, Tasks, Manager
 from .serializers import *
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -138,7 +138,7 @@ class SprintCreateAndListView(generics.ListCreateAPIView):
     #     #     for task in pbi["tasks"]:
     #     #         if 'developer' in task:
     #     #             developer_id = task.pop('developer')
-    #     #             developer = Person.objects.get(pk=developer_id)
+    #     #             developer = Developer.objects.get(pk=developer_id)
     #     #             print(developer)
     #     #             Tasks.objects.create(pbi=pbi_obj, developer=developer, **task)
     #     #         else:
@@ -230,17 +230,40 @@ class CurrentSprintView(generics.RetrieveUpdateDestroyAPIView):
                     "result": data}
         return Response(response)
 
-class PersonCreateAndListView(generics.ListCreateAPIView):
-    queryset = Person.objects.all()
-    serializer_class = PersonSerializer
+class DeveloperCreateAndListView(generics.ListCreateAPIView):
+    queryset = Developer.objects.filter(project=None)
+    serializer_class = DeveloperSerializer
 
-class PersonListView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Person.objects.all()
-    serializer_class = PersonSerializer
+    def create(self, request, *args, **kwargs):
+        super(DeveloperCreateAndListView, self).create(request, args, kwargs)
+        response = {"status_code": status.HTTP_201_CREATED,
+                    "message": "Successfully created",
+                    "result": request.data}
+        return Response(response)
+
+
+class DeveloperListView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Developer.objects.all()
+    serializer_class = DeveloperSerializer
+
+
 
 class ProjectCreateAndListView(generics.ListCreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    def create(self, request, *args, **kwargs):
+        request.GET._mutable = True
+        developers = request.data.pop('developers')
+        super(ProjectCreateAndListView, self).create(request, args, kwargs)
+        project_id = Project.objects.get(name=request.data['name']).id
+        for dev_id in developers:
+            dev = Developer.objects.filter(id=dev_id)
+            dev.update(project=project_id)
+        response = {"status_code": status.HTTP_201_CREATED,
+                    "message": "Successfully created",
+                    "result": request.data}
+        return Response(response)
+
 
 class ProjectListView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Project.objects.all()
@@ -285,4 +308,15 @@ class TasksListView(generics.RetrieveUpdateDestroyAPIView):
         response = {"status_code": status.HTTP_200_OK,
                     "message": "Successfully updated",
                     "result": data}
+        return Response(response)
+
+
+class ManagersCreateAndListView(generics.ListCreateAPIView):
+    queryset = Manager.objects.all()
+    serializer_class = ManagerSerializer
+    def create(self, request, *args, **kwargs):
+        super(ManagersCreateAndListView, self).create(request, args, kwargs)
+        response = {"status_code": status.HTTP_201_CREATED,
+                    "message": "Successfully created",
+                    "result": request.data}
         return Response(response)
