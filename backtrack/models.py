@@ -1,12 +1,20 @@
 from django.db import models
 
+class Manager(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.CharField(max_length=200, default="unspecified")
+    password = models.CharField(max_length=200, default="unspecified")
+
 class Project(models.Model):
     name = models.CharField(max_length=200)
+    manager = models.ForeignKey(Manager, on_delete=models.CASCADE)
 
-class Person(models.Model):
+class Developer(models.Model):
     name = models.CharField(max_length=200)
-    role = models.CharField(max_length=200)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    email = models.CharField(max_length=200, default="unspecified")
+    role = models.CharField(max_length=200, default="developer")
+    password = models.CharField(max_length=200, default="unspecified")
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
 
 class Sprint(models.Model):
     start_date = models.DateField()
@@ -29,7 +37,7 @@ class PBI(models.Model):
     sprint_id = models.ForeignKey(Sprint, on_delete=models.CASCADE, null=True)
 
 class Tasks(models.Model):
-    developer = models.ForeignKey(Person, on_delete=models.CASCADE, null=True)
+    developer = models.ForeignKey(Developer, on_delete=models.CASCADE, null=True)
     pbi = models.ForeignKey(PBI, on_delete=models.CASCADE)
     description = models.CharField(max_length=500)
     name = models.CharField(max_length=500)

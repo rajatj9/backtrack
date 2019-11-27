@@ -1,4 +1,4 @@
-from ..models import PBI, Sprint, Person, Project, Tasks
+from ..models import PBI, Sprint, Developer, Project, Tasks, Manager
 from rest_framework import serializers
 
 
@@ -12,18 +12,23 @@ class SprintSerializer(serializers.ModelSerializer):
         model = Sprint
         fields = ('id','start_date','end_date','capacity','project', 'status')
 
-class PersonSerializer(serializers.ModelSerializer):
+class DeveloperSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Person
-        fields = ('name', 'role', 'project', 'id')
+        model = Developer
+        fields = ('id', 'name', 'project', 'role')
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ['name','id']
+        fields = ('id', 'name','manager')
 
 class TasksSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tasks
         fields = ('id', 'pbi', 'description', 'name', 'developer', 'effort_hours','status')
+
+class ManagerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Manager
+        fields = ('id', 'name')
 
