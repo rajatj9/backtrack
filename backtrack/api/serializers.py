@@ -2,6 +2,8 @@ from ..models import PBI, Sprint, Developer, Project, Tasks, Manager,User
 from rest_framework import serializers
 from allauth.account.adapter import get_adapter
 from rest_auth.registration.serializers import RegisterSerializer
+from rest_framework.authtoken.models import Token
+
 
 
 class PBISerializer(serializers.ModelSerializer):
@@ -17,12 +19,12 @@ class SprintSerializer(serializers.ModelSerializer):
 class DeveloperSerializer(serializers.ModelSerializer):
     class Meta:
         model = Developer
-        fields = ('id', 'name', 'project', 'role')
+        fields = ('id','user','name','project', 'role')
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ('id', 'name','manager')
+        fields = ('id','name','manager')
 
 class TasksSerializer(serializers.ModelSerializer):
     class Meta:
@@ -32,14 +34,14 @@ class TasksSerializer(serializers.ModelSerializer):
 class ManagerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Manager
-        fields = ('id', 'name')
+        fields = ('id','user','name')
 
 
-
+#Users model serializers
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email', 'username', 'password', 'is_developer', 'is_manager')
+        fields = ('id','email', 'username', 'password', 'is_developer', 'is_manager')
 
 
 class CustomRegisterSerializer(RegisterSerializer):
@@ -69,3 +71,30 @@ class CustomRegisterSerializer(RegisterSerializer):
         user.save()
         adapter.save_user(request, user, self)
         return user
+
+class CustomTokenSerializer(serializers.ModelSerializer):
+
+    user_info = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Token
+        fields = ('key','user','user_info')
+
+    #token serializer for getting the project id of developer
+    def get_user_info(self,obj):
+        serializer_data = UserSerializer(obj.user).data
+        print(serializer_data)
+        is_developer = serializer_data.get('is_developer')
+        is_manager = serializer_data.get('is_manager')
+        project_id = -1
+        if is_developer == True:
+            try:
+                developer_obj = Developer.objects.get(user=obj.user)
+                project_id = developer_obj.project.id
+            except Developer.DoesNotExist:
+                print("No developer connected with this user yet")
+        return {
+            'is_developer': is_developer,
+            'is_manager': is_manager,
+            'project_id': project_id
+        }

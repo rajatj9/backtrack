@@ -1,28 +1,25 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-
+#This model is made for an abstract Account model (passwords,email,username)
 class User(AbstractUser):
     is_developer = models.BooleanField()
     is_manager = models.BooleanField()
-
     def __str__(self):
         return self.username
 
 class Manager(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE) #Manager has one to one relation with User
     name = models.CharField(max_length=200)
-    email = models.CharField(max_length=200, default="unspecified")
-    password = models.CharField(max_length=200, default="unspecified")
 
 class Project(models.Model):
     name = models.CharField(max_length=200)
     manager = models.ForeignKey(Manager, on_delete=models.CASCADE)
 
 class Developer(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
-    email = models.CharField(max_length=200, default="unspecified")
     role = models.CharField(max_length=200, default="developer")
-    password = models.CharField(max_length=200, default="unspecified")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
 
 class Sprint(models.Model):

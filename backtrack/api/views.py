@@ -1,8 +1,9 @@
-from ..models import PBI, Sprint, Project, Developer, Tasks, Manager
+from ..models import *
 from .serializers import *
 from rest_framework import generics, status
 from rest_framework.response import Response
 from datetime import *
+
 
 class PBICreateAndListView(generics.ListCreateAPIView):
 
@@ -320,3 +321,13 @@ class ManagersCreateAndListView(generics.ListCreateAPIView):
                     "message": "Successfully created",
                     "result": request.data}
         return Response(response)
+
+
+# users API to view user details
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

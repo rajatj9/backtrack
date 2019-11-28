@@ -14,7 +14,10 @@ urlpatterns = [
     path('sprint/', views.SprintCreateAndListView.as_view(), name=None),
     path('sprint/<int:pk>/', views.SprintListView.as_view(), name=None), #pk is sprint_id
     path('currentsprint/<int:pk>/',views.CurrentSprintView.as_view(),name=None), #pk is project_id
-    path('managers/', views.ManagersCreateAndListView.as_view(), name=None)
+    path('managers/', views.ManagersCreateAndListView.as_view(), name=None),
+    path('users/',views.UserListView.as_view(),name=None),
+    path('users/<int:pk>/',views.UserDetailView.as_view(),name=None)
+
 ]
 
 #/project: Project name and manager ID, list of developer IDs I have to traverse and add that that project name to them
