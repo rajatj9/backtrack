@@ -68,14 +68,26 @@ class CustomRegisterSerializer(RegisterSerializer):
         self.cleaned_data = self.get_cleaned_data()
         user.is_developer = self.cleaned_data.get('is_developer')
         user.is_manager = self.cleaned_data.get('is_manager')
+        created = not user.pk
         user.save()
         adapter.save_user(request, user, self)
+        #create developer or manager models when user is created
+        if (created and user.is_developer):
+            new_developer = Developer()
+            new_developer.role = 'developer'
+            new_developer.name = user.username
+            new_developer.user = user
+            new_developer.save()
+        elif (created and user.is_manager):
+            new_manager = Manager()
+            new_manager.name = user.username
+            new_manager.user = user
+            new_manager.save()
+
         return user
 
 class CustomTokenSerializer(serializers.ModelSerializer):
-
     user_info = serializers.SerializerMethodField()
-
     class Meta:
         model = Token
         fields = ('key','user','user_info')
@@ -90,9 +102,13 @@ class CustomTokenSerializer(serializers.ModelSerializer):
         if is_developer == True:
             try:
                 developer_obj = Developer.objects.get(user=obj.user)
-                project_id = developer_obj.project.id
             except Developer.DoesNotExist:
                 print("No developer connected with this user yet")
+            try:
+                project_id = developer_obj.project.id
+            except AttributeError:
+                print("Developer has no project yet")
+
         return {
             'is_developer': is_developer,
             'is_manager': is_manager,
