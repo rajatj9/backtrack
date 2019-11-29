@@ -150,3 +150,15 @@ REST_AUTH_SERIALIZERS = {
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'backtrack.api.serializers.CustomRegisterSerializer',
 }
+
+REST_FRAMEWORK = {
+'DEFAULT_AUTHENTICATION_CLASSES': (
+'rest_framework.authentication.TokenAuthentication',
+)
+}
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'orgbacktrack@gmail.com'
+EMAIL_HOST_PASSWORD = 'backtrack@123'

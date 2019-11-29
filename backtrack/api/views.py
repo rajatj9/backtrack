@@ -3,7 +3,8 @@ from .serializers import *
 from rest_framework import generics, status
 from rest_framework.response import Response
 from datetime import *
-
+from django.core.mail import send_mail
+from django.conf import settings
 
 class PBICreateAndListView(generics.ListCreateAPIView):
 
@@ -247,8 +248,6 @@ class DeveloperListView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Developer.objects.all()
     serializer_class = DeveloperSerializer
 
-
-
 class ProjectCreateAndListView(generics.ListCreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
@@ -257,9 +256,17 @@ class ProjectCreateAndListView(generics.ListCreateAPIView):
         developers = request.data.pop('developers')
         super(ProjectCreateAndListView, self).create(request, args, kwargs)
         project_id = Project.objects.get(name=request.data['name']).id
+        recipient_list = []
+        manager = Manager.objects.get(id=request.data['manager'])
         for dev_id in developers:
             dev = Developer.objects.filter(id=dev_id)
             dev.update(project=project_id)
+            user = User.objects.get(username=dev[0].user)
+            recipient_list.append(user.email)
+        subject = "You have been added to project " + request.data['name'] + "!"
+        message = " You were added to the new project " + request.data['name'] + " by " + manager.name
+        email_from = settings.EMAIL_HOST_USER
+        send_mail(subject, message, email_from, recipient_list)
         response = {"status_code": status.HTTP_201_CREATED,
                     "message": "Successfully created",
                     "result": request.data}
