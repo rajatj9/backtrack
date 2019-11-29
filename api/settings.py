@@ -37,10 +37,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'rest_auth.registration',
     'backtrack',
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_auth',
     'corsheaders'
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -125,3 +133,20 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CSRF_COOKIE_NAME = "csrftoken"
+
+#user login settings
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+AUTH_USER_MODEL = 'backtrack.User'
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'backtrack.api.serializers.UserSerializer',
+    'TOKEN_SERIALIZER': 'backtrack.api.serializers.CustomTokenSerializer'
+}
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'backtrack.api.serializers.CustomRegisterSerializer',
+}
