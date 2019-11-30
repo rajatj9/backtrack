@@ -98,7 +98,7 @@ class CustomTokenSerializer(serializers.ModelSerializer):
         print(serializer_data)
         is_developer = serializer_data.get('is_developer')
         is_manager = serializer_data.get('is_manager')
-        project_id = -1
+        project_id = None
         if is_developer == True:
             try:
                 developer_obj = Developer.objects.get(user=obj.user)
