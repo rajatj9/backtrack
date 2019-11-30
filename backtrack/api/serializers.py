@@ -1,9 +1,9 @@
-from ..models import PBI, Sprint, Developer, Project, Tasks, Manager,User
-from rest_framework import serializers
 from allauth.account.adapter import get_adapter
 from rest_auth.registration.serializers import RegisterSerializer
+from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
+from ..models import PBI, Sprint, Developer, Project, Tasks, Manager, User
 
 
 class PBISerializer(serializers.ModelSerializer):
@@ -24,7 +24,7 @@ class DeveloperSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ('id','name','manager')
+        fields = ('id', 'name', 'manager', 'owner')
 
 class TasksSerializer(serializers.ModelSerializer):
     class Meta:

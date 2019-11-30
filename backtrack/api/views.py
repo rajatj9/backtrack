@@ -1,10 +1,12 @@
-from ..models import *
-from .serializers import *
+from datetime import *
+
+from django.conf import settings
+from django.core.mail import send_mail
 from rest_framework import generics, status
 from rest_framework.response import Response
-from datetime import *
-from django.core.mail import send_mail
-from django.conf import settings
+
+from .serializers import *
+
 
 class PBICreateAndListView(generics.ListCreateAPIView):
 
@@ -254,23 +256,31 @@ class ProjectCreateAndListView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         request.GET._mutable = True
         developers = request.data.pop('developers')
-        super(ProjectCreateAndListView, self).create(request, args, kwargs)
-        project_id = Project.objects.get(name=request.data['name']).id
-        recipient_list = []
-        manager = Manager.objects.get(id=request.data['manager'])
-        for dev_id in developers:
-            dev = Developer.objects.filter(id=dev_id)
-            dev.update(project=project_id)
-            user = User.objects.get(username=dev[0].user)
-            recipient_list.append(user.email)
-        subject = "You have been added to project " + request.data['name'] + "!"
-        message = " You were added to the new project " + request.data['name'] + " by " + manager.name
-        email_from = settings.EMAIL_HOST_USER
-        send_mail(subject, message, email_from, recipient_list)
-        response = {"status_code": status.HTTP_201_CREATED,
-                    "message": "Successfully created",
-                    "result": request.data}
-        return Response(response)
+        owner = Developer.objects.filter(id=request.data['owner'])
+        if (owner[0].project != None):
+            response = {"status_code": status.HTTP_406_NOT_ACCEPTABLE,
+                        "message": "Product owner can't create more than one project"}
+            return Response(response)
+        else:
+            super(ProjectCreateAndListView, self).create(request, args, kwargs)
+            project_id = Project.objects.get(name=request.data['name']).id
+            owner.update(project=project_id)
+            owner.update(role="Product Owner")
+            recipient_list = []
+            manager = Manager.objects.get(id=request.data['manager'])
+            for dev_id in developers:
+                dev = Developer.objects.filter(id=dev_id)
+                dev.update(project=project_id)
+                user = User.objects.get(username=dev[0].user)
+                recipient_list.append(user.email)
+            subject = "You have been added to project " + request.data['name'] + "!"
+            message = " You were added to the new project " + request.data['name'] + " by " + manager.name
+            email_from = settings.EMAIL_HOST_USER
+            send_mail(subject, message, email_from, recipient_list)
+            response = {"status_code": status.HTTP_201_CREATED,
+                        "message": "Successfully created",
+                        "result": request.data}
+            return Response(response)
 
 
 class ProjectListView(generics.RetrieveUpdateDestroyAPIView):
