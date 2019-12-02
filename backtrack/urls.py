@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+
 from .api import views
 
 urlpatterns = [
@@ -16,8 +16,9 @@ urlpatterns = [
     path('currentsprint/<int:pk>/',views.CurrentSprintView.as_view(),name=None), #pk is project_id
     path('managers/', views.ManagersCreateAndListView.as_view(), name=None),
     path('users/',views.UserListView.as_view(),name=None),
-    path('users/<int:pk>/',views.UserDetailView.as_view(),name=None)
-
+    path('users/<int:pk>/', views.UserDetailView.as_view(), name=None),
+    path('manager_projects/', views.ManagerProjectsView.as_view(), name=None),
+    path('pbis_in_project/', views.PBIInProjectView.as_view(), name=None)
 ]
 
-#/project: Project name and manager ID, list of developer IDs I have to traverse and add that that project name to them
+# send project ID --> PBIs related to that project ID

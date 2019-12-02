@@ -250,6 +250,49 @@ class DeveloperListView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Developer.objects.all()
     serializer_class = DeveloperSerializer
 
+
+class PBIInProjectView(generics.ListAPIView):
+    queryset = PBI.objects.all()
+    serializer_class = PBISerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        needed_project = request.GET['id']
+        pbis = PBI.objects.filter(project_id=needed_project)
+        returned_pbi_ids = []
+        for pbi in pbis:
+            returned_pbi_ids.append(pbi.id)
+        print(returned_pbi_ids)
+        response = {"status_code": status.HTTP_200_OK, "message": "Retreived!", "result": returned_pbi_ids}
+        return Response(response)
+
+
+class ManagerProjectsView(generics.ListAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        needed_manager = request.GET['id']
+        projects = Project.objects.filter(manager=needed_manager)
+        returned_project_ids = []
+        for project in projects:
+            returned_project_ids.append(project.id)
+        print(returned_project_ids)
+        response = {"status_code": status.HTTP_200_OK, "message": "Retreived!", "result": returned_project_ids}
+        return Response(response)
+
+
 class ProjectCreateAndListView(generics.ListCreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
