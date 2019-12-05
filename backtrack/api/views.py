@@ -26,7 +26,7 @@ class PBICreateAndListView(generics.ListCreateAPIView):
             if(task.status!="COMPLETED"):
                 all_tasks_completed = False
                 break
-        if(all_tasks_completed):
+        if (all_tasks_completed and len(tasks) > 0):
             PBI.objects.filter(id=pbi_id).update(status="COMPLETED")
 
     def update_priorities(self, inserting_priority):
