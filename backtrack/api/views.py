@@ -265,7 +265,15 @@ class PBIInProjectView(generics.ListAPIView):
         pbis = PBI.objects.filter(project_id=needed_project)
         returned_pbi_ids = []
         for pbi in pbis:
-            returned_pbi_ids.append(pbi.id)
+            returnable = {}
+            returnable['pbi_id'] = pbi.id
+            returnable['pbi_name'] = pbi.name
+            returnable['pbi_description'] = pbi.description
+            returnable['pbi_priority'] = pbi.priority
+            returnable['pbi_story_points'] = pbi.story_points
+            returnable['pbi_sprint_id'] = pbi.sprint_id
+            returnable['pbi_status'] = pbi.status
+            returned_pbi_ids.append(returnable)
         print(returned_pbi_ids)
         response = {"status_code": status.HTTP_200_OK, "message": "Retreived!", "result": returned_pbi_ids}
         return Response(response)
@@ -287,7 +295,10 @@ class ManagerProjectsView(generics.ListAPIView):
         projects = Project.objects.filter(manager=needed_manager)
         returned_project_ids = []
         for project in projects:
-            returned_project_ids.append(project.id)
+            returnable = {}
+            returnable['project_id'] = project.id
+            returnable['project_name'] = project.name
+            returned_project_ids.append(returnable)  # also project name
         print(returned_project_ids)
         response = {"status_code": status.HTTP_200_OK, "message": "Retreived!", "result": returned_project_ids}
         return Response(response)
