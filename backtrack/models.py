@@ -1,5 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+
 
 #This model is made for an abstract Account model (passwords,email,username)
 class User(AbstractUser):
@@ -15,6 +16,7 @@ class Manager(models.Model):
 class Project(models.Model):
     name = models.CharField(max_length=200)
     manager = models.ForeignKey(Manager, on_delete=models.CASCADE)
+    owner = models.CharField(max_length=200, default="Not Yet Assigned")
 
 class Developer(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
