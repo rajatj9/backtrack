@@ -271,7 +271,10 @@ class PBIInProjectView(generics.ListAPIView):
             returnable['pbi_description'] = pbi.description
             returnable['pbi_priority'] = pbi.priority
             returnable['pbi_story_points'] = pbi.story_points
-            returnable['pbi_sprint_id'] = pbi.sprint_id
+            if (pbi.sprint_id != None):
+                returnable['pbi_sprint_id'] = pbi.sprint_id.id
+            else:
+                returnable['pbi_sprint_id'] = pbi.sprint_id
             returnable['pbi_status'] = pbi.status
             returned_pbi_ids.append(returnable)
         print(returned_pbi_ids)
