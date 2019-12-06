@@ -211,28 +211,33 @@ class CurrentSprintView(generics.RetrieveUpdateDestroyAPIView):
         sprints = Sprint.objects.filter(project=project_instance)
 
         #get the most recent sprint (by start_date)
-        current_sprint = sprints.latest()
-        serializer = SprintSerializer(current_sprint)
-        data = serializer.data
+        try:
+            current_sprint = sprints.latest()
+            serializer = SprintSerializer(current_sprint)
+            data = serializer.data
 
-        #get PBI objects for this sprint from its sprint id
-        pbis = PBI.objects.filter(sprint_id=current_sprint.id)
-        data["pbis"] = []
-        for pbi in pbis:
-            pbi_serialized = PBISerializer(pbi)
-            #get the tasks for this PBI
-            task_for_pbi = Tasks.objects.filter(pbi=pbi.id)
-            task_serialized = TasksSerializer(task_for_pbi, many=True)
-            temp = {}
-            temp["pbi_id"] = pbi.id
-            temp["name"] = pbi.name
-            temp["tasks"] = task_serialized.data
-            data["pbis"].append(temp)
+            # get PBI objects for this sprint from its sprint id
+            pbis = PBI.objects.filter(sprint_id=current_sprint.id)
+            data["pbis"] = []
+            for pbi in pbis:
+                pbi_serialized = PBISerializer(pbi)
+                # get the tasks for this PBI
+                task_for_pbi = Tasks.objects.filter(pbi=pbi.id)
+                task_serialized = TasksSerializer(task_for_pbi, many=True)
+                temp = {}
+                temp["pbi_id"] = pbi.id
+                temp["name"] = pbi.name
+                temp["tasks"] = task_serialized.data
+                data["pbis"].append(temp)
 
-        response = {"status_code": status.HTTP_200_OK,
-                    "message": "Successfully retrieved",
-                    "result": data}
-        return Response(response)
+            response = {"status_code": status.HTTP_200_OK,
+                        "message": "Successfully retrieved",
+                        "result": data}
+            return Response(response)
+        except:
+            response = {"status_code": status.HTTP_404_NOT_FOUND,
+                        "message": "No current Sprint!"}
+            return Response(response)
 
 class DeveloperCreateAndListView(generics.ListCreateAPIView):
     queryset = Developer.objects.filter(project=None)
