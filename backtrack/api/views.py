@@ -266,16 +266,16 @@ class PBIInProjectView(generics.ListAPIView):
         returned_pbi_ids = []
         for pbi in pbis:
             returnable = {}
-            returnable['pbi_id'] = pbi.id
-            returnable['pbi_name'] = pbi.name
-            returnable['pbi_description'] = pbi.description
-            returnable['pbi_priority'] = pbi.priority
-            returnable['pbi_story_points'] = pbi.story_points
+            returnable['id'] = pbi.id
+            returnable['name'] = pbi.name
+            returnable['description'] = pbi.description
+            returnable['priority'] = pbi.priority
+            returnable['story_points'] = pbi.story_points
             if (pbi.sprint_id != None):
-                returnable['pbi_sprint_id'] = pbi.sprint_id.id
+                returnable['sprint_id'] = pbi.sprint_id.id
             else:
-                returnable['pbi_sprint_id'] = pbi.sprint_id
-            returnable['pbi_status'] = pbi.status
+                returnable['sprint_id'] = pbi.sprint_id
+            returnable['status'] = pbi.status
             returned_pbi_ids.append(returnable)
         print(returned_pbi_ids)
         response = {"status_code": status.HTTP_200_OK, "message": "Retreived!", "result": returned_pbi_ids}
