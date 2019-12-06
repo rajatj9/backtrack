@@ -98,19 +98,28 @@ class CustomTokenSerializer(serializers.ModelSerializer):
         print(serializer_data)
         is_developer = serializer_data.get('is_developer')
         is_manager = serializer_data.get('is_manager')
-        project_id = -1
+        project_id = None
+        person_id = None
         if is_developer == True:
             try:
                 developer_obj = Developer.objects.get(user=obj.user)
+                person_id = developer_obj.id
             except Developer.DoesNotExist:
                 print("No developer connected with this user yet")
             try:
                 project_id = developer_obj.project.id
             except AttributeError:
                 print("Developer has no project yet")
+        elif is_manager == True:
+            try:
+                manager_obj = Manager.objects.get(user = obj.user)
+                person_id = manager_obj.id
+            except Manager.DoesNotExist:
+                print("Manager does not exist yet")
 
         return {
             'is_developer': is_developer,
             'is_manager': is_manager,
+            'id': person_id,
             'project_id': project_id
         }
