@@ -336,7 +336,8 @@ class ProjectCreateAndListView(generics.ListCreateAPIView):
             send_mail(subject, message, email_from, recipient_list)
             response = {"status_code": status.HTTP_201_CREATED,
                         "message": "Successfully created",
-                        "result": request.data}
+                        "result": request.data,
+                        "project_id": project_id}
             return Response(response)
 
 
