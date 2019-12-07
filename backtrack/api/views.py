@@ -338,7 +338,7 @@ class ProjectCreateAndListView(generics.ListCreateAPIView):
                 user = User.objects.get(username=dev[0].user)
                 recipient_list.append(user.email)
             subject = "You have been added to project " + request.data['name'] + "!"
-            message = " You were added to the new project " + request.data['name'] + " by " + manager.name
+            message = " You were added to the new project " + request.data['name'] + " by " + owner.name
             email_from = settings.EMAIL_HOST_USER
             send_mail(subject, message, email_from, recipient_list)
             response = {"status_code": status.HTTP_201_CREATED,
