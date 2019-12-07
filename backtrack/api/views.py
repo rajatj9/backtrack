@@ -227,6 +227,7 @@ class CurrentSprintView(generics.RetrieveUpdateDestroyAPIView):
                 temp = {}
                 temp["pbi_id"] = pbi.id
                 temp["name"] = pbi.name
+                temp["status"] = pbi.status
                 temp["tasks"] = task_serialized.data
                 data["pbis"].append(temp)
 
