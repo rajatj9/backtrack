@@ -372,6 +372,17 @@ class TasksListView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Tasks.objects.all()
     serializer_class = TasksSerializer
 
+    def check_completion(self, pbi_id):
+        tasks = Tasks.objects.filter(pbi=pbi_id)
+        print("TASKS:", tasks)
+        all_tasks_completed = True
+        for task in tasks:
+            if (task.status != "COMPLETED"):
+                all_tasks_completed = False
+                break
+        if (all_tasks_completed and len(tasks) > 0):
+            PBI.objects.filter(id=pbi_id).update(status="COMPLETED")
+
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -387,6 +398,8 @@ class TasksListView(generics.RetrieveUpdateDestroyAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         data = serializer.data
+        pbi_id = data['pbi']
+        self.check_completion(pbi_id)
         response = {"status_code": status.HTTP_200_OK,
                     "message": "Successfully updated",
                     "result": data}
