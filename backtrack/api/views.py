@@ -283,7 +283,8 @@ class PBIInProjectView(generics.ListAPIView):
             returnable['status'] = pbi.status
             returned_pbi_ids.append(returnable)
         print(returned_pbi_ids)
-        response = {"status_code": status.HTTP_200_OK, "message": "Retreived!", "result": returned_pbi_ids}
+        returnable = sorted(returned_pbi_ids, key=lambda k: k['priority'], reverse=False)
+        response = {"status_code": status.HTTP_200_OK, "message": "Retreived!", "result": returnable}
         return Response(response)
 
 
